@@ -22,9 +22,7 @@ public class JeopardyClient extends Thread implements Closeable {
     private final BlockingQueue<String> messageQueue;
     private volatile int score;
     private volatile boolean playerTurn;
-    private volatile boolean exitGame;
     private final TUI tui;
-//    private final ArrayList<ArrayList<Question_board>> theQuestionsArraysForTheGame;
 
     public JeopardyClient(JeopardyServer server, Socket socket, String name) throws IOException {
         this.server = server;
@@ -36,9 +34,7 @@ public class JeopardyClient extends Thread implements Closeable {
         this.name = name;
         this.score = 0;
         this.playerTurn = false;
-        this.exitGame = false;
         this.tui = new TUI(new Scanner(socket.getInputStream()), new PrintWriter(socket.getOutputStream()));
-//        this.theQuestionsArraysForTheGame = theQuestionsArraysForTheGame;
     }
 
     public String getClientName() {
@@ -54,7 +50,7 @@ public class JeopardyClient extends Thread implements Closeable {
 
 
                 JeopardyClient superThis = this;
-                JeopardyGame game = server.getActiveGame(tui);
+                JeopardyGame game = server.getActiveGame();
                 game.play(superThis, new JeopardyGame.GameParticipant() {
 
                     @Override
@@ -74,15 +70,6 @@ public class JeopardyClient extends Thread implements Closeable {
                     @Override
                     public void buzz() {
                         handler.printMessage("You won the turn!");
-                    }
-
-                    @Override
-                    public void notifyWinner(JeopardyClient winner) {
-                        if (winner.equals(superThis)) {
-                            handler.printMessage("Yes you won");
-                        } else {
-                            handler.printMessage("Dammm, you lost to " + winner.getClientName());
-                        }
                     }
 
                     @Override
@@ -169,11 +156,6 @@ public class JeopardyClient extends Thread implements Closeable {
                     }
 
                     @Override
-                    public void backSwitch() {
-//                        tui.loader();
-                    }
-
-                    @Override
                     public void exitSwitch(String clientName) throws IOException {
                         tui.exitGame(clientName);
                         socket.close();
@@ -251,55 +233,20 @@ public class JeopardyClient extends Thread implements Closeable {
                         tui.itsYourTurn();
                     }
 
-
-
-
                 });
 
-
-                //tui.loader();
-//                t.start();
-//                tui.loader();
-
-
-//                if(server.getNumberOfPlayer() != 2){
-//                    tui.waitingForOnMorePlayer(getClientName());
-//                    while(server.getNumberOfPlayer() != 2){
-//                        this.wait();
-//                    }
-//                }
-//                tui.welcomeMessage(getClientName());
-//                tui.loaderLong();
-                //socket.close();
             } else {
                 tui.toManyPlayers();
                 socket.close();
                 server.removeClient(this);
             }
 
-
-
-//            String previousName = name;
-//            name = handler.fetchName();
-//            server.announceName(this, previousName);
-            //t.start();
-
-//            while (true) {
-//                String inbound = messageQueue.take();
-//                handler.printMessage(inbound);
-//            }
         } catch (IOException | InterruptedException | ParseException e) {
             System.out.println(name + " exited with: " + e.getMessage());
         } finally {
             try { close(); } catch (IOException e) {
                 e.printStackTrace();
             }
-//            try {
-//                t.interrupt();
-//                t.join(1000);
-//            } catch (InterruptedException e) {
-//                t.stop();
-//            }
         }
     }
 
@@ -317,14 +264,6 @@ public class JeopardyClient extends Thread implements Closeable {
 
     public void setPlayerTurn(boolean playerTurn) {
         this.playerTurn = playerTurn;
-    }
-
-    public boolean isExitGame() {
-        return exitGame;
-    }
-
-    public void setExitGame(boolean exitGame) {
-        this.exitGame = exitGame;
     }
 
     @Override

@@ -10,18 +10,6 @@ import java.util.List;
 public class JeopardyGame {
     private volatile int waiting;
     private volatile JeopardyClient winner;
-    private static final List<String> words =
-            List.of("verysecret",
-                    "ordblind",
-                    "Stewerdesse",
-                    "banan",
-                    "ekstraordinær",
-                    "kagemand",
-                    "kaospilot",
-                    "ferskensmag",
-                    "StrengeSpil",
-                    "speciallægepraksisplanlægningsstabiliseringsperiode"
-            );
     private volatile List<JeopardyClient> clients;
     private final ArrayList<ArrayList<Question_board>> easyHardArray;
     private int numberOfAnswers;
@@ -33,13 +21,9 @@ public class JeopardyGame {
     private volatile int index_end;
     private volatile int question_index;
     private volatile String playerCategoryChoice;
-    private final TUI tui;
     private boolean switchPlayer;
 
-//    private JeopardyClient player1;
-//    private JeopardyClient player2;
-
-    public JeopardyGame(int capacity, List<JeopardyClient> clients, ArrayList<ArrayList<Question_board>> easyHardArray, TUI tui) {
+    public JeopardyGame(int capacity, List<JeopardyClient> clients, ArrayList<ArrayList<Question_board>> easyHardArray) {
         this.waiting = capacity;
         this.clients = clients;
         this.easyHardArray = easyHardArray;
@@ -52,32 +36,15 @@ public class JeopardyGame {
         this.index_end = 0;
         this.question_index = 0;
         this.playerCategoryChoice = "";
-        this.tui = tui;
         this.switchPlayer = false;
-
-
         this.winner = null;
     }
 
-//    private List<JeopardyClient> randomPlayer() {
-//        List<JeopardyClient>  shuffledClients = new ArrayList<>(clients);
-//        Collections.shuffle(shuffledClients);
-//        return shuffledClients;
-//    }
-
     public void play(JeopardyClient client, GameParticipant participant) throws InterruptedException, IOException {
-
 
         await(participant, client);
 
-
         participant.weHaveAllThePlayers();
-//        tui.weHaveAllThePlayers();
-//                        tui.loader();
-//        tui.welcomeMessage(client.getClientName());
-//                        tui.loaderLong();
-
-
 
         choose1stCategory(client, participant);
 
@@ -91,7 +58,6 @@ public class JeopardyGame {
             this.notifyAll();
         } else {
             while (waiting > 0) {
-//                tui.waitingForOnMorePlayer(client.getClientName());
                 participant.WeAreWaitingForMorePlayers();
                 this.wait();
             }
@@ -111,13 +77,10 @@ public class JeopardyGame {
     
 
     public void choose1stCategory(JeopardyClient client, GameParticipant participant) {
-//        turnPlayer1 = true;
         clients.get(0).setPlayerTurn(true);
         if (client.isPlayerTurn()) {
-//            tui.youWonThetoes();
             participant.youStartTheGameAndChooseCategory();
         } else {
-//            tui.youDidntWinThetoes();
             participant.theOtherPlayerISChoosingACategory();
         }
     }
@@ -126,46 +89,31 @@ public class JeopardyGame {
         if (numberOfAnswers < 30) {
 
             chooseCategory(client, participant, easyHardArray.get(0));
-
             awaitForPlayer();
 
             if(!exitGame){
-                //Get the category title to display
-//            tui.getCategoryTitle(easyHardArray.get(0).get(index_start).getCategory().getCategoryName());
                 participant.getCategoryTitle(easyHardArray.get(0).get(index_start).getCategory().getCategoryName());
-
                 chooseQuestion(client, participant, easyHardArray.get(0));
             }
 
             if(!exitGame){
-                awaitForPlayer();
 
+                awaitForPlayer();
                 displayTheQuestion(easyHardArray.get(0),index_start, question_index, participant, client);
-
-
                 awaitForPlayer();
-
-
                 playEnterGame(participant);
                 switchPlayerAfterEnterGame(client, participant);
                 done();
-
                 getAnswerFromPlayer(easyHardArray.get(0), participant, client);
-
                 awaitForPlayer();
 
                 if(switchPlayer){
                     switchPlayer(client, participant);
                 }
 
-                //We restart the categories by showing the "loader"
                 participant.loaderLong();
-//            tui.loaderLong();
-
                 this.switchPlayer = false;
                 this.waitingGame = 2;
-
-                //Go back to category choice via "redirect
                 redirectAfterSwitch(participant, client);
             }
 
@@ -175,24 +123,52 @@ public class JeopardyGame {
                 participant.youAreTheWinner(client.getClientName());
             }
 
-
         } else {
 
             if(numberOfAnswers == 30){
                 participant.getHardBoardMessage();
-//                tui.getHardBoardMessage();
             }
 
             chooseCategory(client, participant, easyHardArray.get(1));
+            awaitForPlayer();
+
+            if(!exitGame){
+                participant.getCategoryTitle(easyHardArray.get(1).get(index_start).getCategory().getCategoryName());
+                chooseQuestion(client, participant, easyHardArray.get(1));
+            }
+
+            if(!exitGame){
+
+                awaitForPlayer();
+                displayTheQuestion(easyHardArray.get(1),index_start, question_index, participant, client);
+                awaitForPlayer();
+                playEnterGame(participant);
+                switchPlayerAfterEnterGame(client, participant);
+                done();
+                getAnswerFromPlayer(easyHardArray.get(0), participant, client);
+                awaitForPlayer();
+
+                if(switchPlayer){
+                    switchPlayer(client, participant);
+                }
+
+                participant.loaderLong();
+                this.switchPlayer = false;
+                this.waitingGame = 2;
+                redirectAfterSwitch(participant, client);
+            }
+
+            if(client.isPlayerTurn()){
+                participant.exitSwitch(client.getClientName());
+            } else {
+                participant.youAreTheWinner(client.getClientName());
+            }
         }
     }
 
     public void chooseCategory(JeopardyClient client, GameParticipant participant, ArrayList<Question_board> list) throws InterruptedException, IOException {
 
-
-//        participant.drawBoard(list);
         participant.drawBoard(list);
-
 
         if (client.isPlayerTurn()) {
 
@@ -200,9 +176,7 @@ public class JeopardyGame {
             List<String> answerIndex = List.of("a", "b", "c", "d", "e", "f");
 
             //Player category choice
-//            playerCategoryChoice = tui.playerCategoryInput();
             playerCategoryChoice = participant.playerCategoryChoice();
-
 
             //We check if the players input is on the list and return the index number. Else it returns -1
             int input_index_categoty = answerIndex.lastIndexOf(playerCategoryChoice);
@@ -222,7 +196,6 @@ public class JeopardyGame {
 
                 //Go back to category choice via "redirect
                 redirectAfterSwitch(participant, client);
-
             }
         } else {
 
@@ -237,21 +210,16 @@ public class JeopardyGame {
 
     public void chooseQuestion(JeopardyClient client, GameParticipant participant, ArrayList<Question_board> list) throws InterruptedException, IOException {
 
-
-
         if (client.isPlayerTurn()) {
 
             //A list of the answers possibilities for the categories/questions
             List<String> answerIndex = List.of("a", "b", "c", "d", "e");
-
-//            activePlayerName = client.getClientName();
 
             //Get the available questions and non if they are answered
             availableQuestionsInCategory(index_start, index_end, list, participant);
 
             //Player Question choice
             String playerQuestionChoice = participant.playerQuestionInputChoice();
-//            String playerQuestionChoice = tui.playerQuestionInputChoice().toLowerCase();
 
             //We check if the players input is on the list and return the index number. Else it returns -1
             int input_index_question = answerIndex.lastIndexOf(playerQuestionChoice);
@@ -261,6 +229,7 @@ public class JeopardyGame {
 
                 //input_index_question will be 0, 1, 2, 3 or 4
                 question_index = input_index_question;
+
             } else {
 
                 //If the player answer doesn't match the answerIndex, we got to the switch statements
@@ -268,7 +237,6 @@ public class JeopardyGame {
 
                 //Go back to category choice via "redirect
                 redirectAfterSwitch(participant, client);
-
             }
         } else {
             this.waitingGame = 2;
@@ -282,7 +250,6 @@ public class JeopardyGame {
 
 
     public void playEnterGame(GameParticipant participant) throws InterruptedException {
-        
         participant.notifyGameStart();
         while (true) {
             if (done() || participant.getAnswer().equals("")) {
@@ -316,7 +283,6 @@ public class JeopardyGame {
 
     public void availableQuestionsInCategory(int index_start, int index_end, ArrayList<Question_board> list, GameParticipant participant){
 
-
         String[] choiseSpots = {"A", "B", "C", "D", "E"};
         int choiseCount = 0;
 
@@ -325,13 +291,10 @@ public class JeopardyGame {
 
                 participant.availableQuestionsInCategoryAndPoint(choiseSpots[choiseCount], list.get(i).getScore());
 
-//                tui.availableQuestionsInCategoryAndPoint(choiseSpots[choiseCount], list.get(i).getScore());
-
             } else {
 
                 participant.nonAvailableQuestionsInCategoryAndPoint(choiseSpots[choiseCount]);
 
-//                tui.nonAvailableQuestionsInCategoryAndPoint(choiseSpots[choiseCount]);
             }
             choiseCount ++;
         }
@@ -345,7 +308,6 @@ public class JeopardyGame {
 
                 //Player answer
                 String answer = participant.playerQuestionInputAnswer();
-//                String answer = tui.playerQuestionInputAnswer();
 
                 //We check if the players answer matches the right answer
                 validateAnswer(list, index_start, question_index, answer, participant, client);
@@ -354,7 +316,6 @@ public class JeopardyGame {
                 numberOfAnswers += 1;
             }
         } else {
-
             this.waitingGame = 2;
             try{
                 Thread.sleep(3000);
@@ -362,30 +323,24 @@ public class JeopardyGame {
                 throw new UnsupportedOperationException("You got an InterruptedException: " + e.getMessage());
             }
         }
-
     }
 
 
     public void displayTheQuestion(ArrayList<Question_board> list, int index_start, int question_index, GameParticipant participant, JeopardyClient client) throws IOException, InterruptedException {
         if(list.get(index_start + question_index).getAnswered() != null){
             participant.questionHasAlreadyBeenPlayed();
-//            tui.questionHasAlreadyBeenPlayed();
             chooseQuestion(client, participant, list);
-            //waitingGame = 2;
         } else {
             participant.getQuestion(list.get(index_start + question_index).getQuestion());
-//            tui.getQuestion(list.get(index_start + question_index).getQuestion());
         }
     }
 
     public boolean getTheQuestion(ArrayList<Question_board> list, int index_start, int question_index, GameParticipant participant){
         if(list.get(index_start + question_index).getAnswered() != null){
             participant.questionHasAlreadyBeenPlayed();
-//            tui.questionHasAlreadyBeenPlayed();
             return false;
         } else {
             participant.getQuestion(list.get(index_start + question_index).getQuestion());
-//            tui.getQuestion(list.get(index_start + question_index).getQuestion());
             return true;
         }
     }
@@ -395,7 +350,6 @@ public class JeopardyGame {
 
             //Message to the player
             participant.correctAnswer(client.getClientName(), list.get(index_start + question_index).getScore());
-//            tui.correctAnswer(client.getClientName(), list.get(index_start + question_index).getScore());
 
             //We add the score to the player
             client.setScore(client.getScore() + list.get(index_start + question_index).getScore());
@@ -406,7 +360,6 @@ public class JeopardyGame {
         } else {
             //Message to the player
             participant.incorrectAnswer(client.getClientName(), list.get(index_start + question_index).getAnswer());
-//            tui.incorrectAnswer(client.getClientName(), list.get(index_start + question_index).getAnswer());
 
             //We subtract the score to the player
             client.setScore(client.getScore() - list.get(index_start + question_index).getScore());
@@ -419,32 +372,25 @@ public class JeopardyGame {
         }
     }
 
-    public void getSwitch(String playerInput, GameParticipant participant, JeopardyClient client) throws InterruptedException, IOException {
+    public void getSwitch(String playerInput, GameParticipant participant, JeopardyClient client) {
         switch (playerInput) {
             case "help":
-//                tui.getHelpGame();
                 participant.helpSwitch();
                 break;
             case "score":
                 if(client.isPlayerTurn()){
-//                    tui.getScore(client.getClientName(), client.getScore());
                     participant.getScoreSwitch(client.getClientName(), client.getScore());
                 }
                 break;
             case "board":
-//                tui.getBoardStatus(numberOfAnswers);
                 participant.getBoardSwitch(numberOfAnswers);
 
                 break;
             case "exit":
-                if(client.isPlayerTurn()){
-                    client.setExitGame(true);
-                }
                 exitGame = true;
                 break;
             default:
                 participant.defaultSwitch();
-//                tui.gameDefaultMessage();
 
         }
     }
@@ -475,63 +421,34 @@ public class JeopardyGame {
     public static interface GameParticipant {
 
         void notifyGameStart();
-        void notifyWinner(JeopardyClient client);
         String getAnswer() throws InterruptedException;
         JeopardyClient getClient();
-
         void weHaveAllThePlayers();
         void WeAreWaitingForMorePlayers();
-
         void youStartTheGameAndChooseCategory();
-
         void theOtherPlayerISChoosingACategory();
-
-
         void drawBoard(ArrayList<Question_board> question_boards);
-
         String playerCategoryChoice();
-
-
         void getCategoryTitle(String categoryName);
-
-
         void helpSwitch();
         void getScoreSwitch(String clientName, int score);
         void getBoardSwitch(int numberOfAnswers);
-        void backSwitch();
         void exitSwitch(String clientName) throws IOException;
         void defaultSwitch();
-
-
         void youAreTheWinner(String clientName) throws IOException;
-
         void getHardBoardMessage();
-
         void availableQuestionsInCategoryAndPoint(String choiseSpot, int score);
-
         void nonAvailableQuestionsInCategoryAndPoint(String choiseSpot);
-
         String playerQuestionInputChoice();
-
         void loaderLong();
-
         String playerQuestionInputAnswer();
-
         void correctAnswer(String clientName, int score);
-
         void incorrectAnswer(String clientName, String answer);
-
         void questionHasAlreadyBeenPlayed();
-
         void getQuestion(String question);
-
-
         void youLostYourTurn();
-
         void itsYourTurn();
-
         void toSlow();
-
         void buzz();
     }
 }

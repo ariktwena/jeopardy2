@@ -13,7 +13,6 @@ import java.util.List;
 public class JeopardyServer extends Thread {
     private final ServerSocket socket;
     private final List<JeopardyClient> clients;
-//    private ArrayList<ArrayList<Question_board>> theQuestionsArraysForTheGame = new ArrayList<>();
 
     public JeopardyServer(ServerSocket socket, List<JeopardyClient> clients) {
         this.socket = socket;
@@ -37,9 +36,6 @@ public class JeopardyServer extends Thread {
                         "anonymous");
                 addClient(client);
                 client.start();
-//                if(clients.size() == 2){
-//                    initiateGame();
-//                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -86,53 +82,16 @@ public class JeopardyServer extends Thread {
         }
     }
 
-//    public void initiateGame () throws IOException, ParseException {
-////        ArrayList<ArrayList<Question_board>> theQuestionsArraysForTheGame = new ArrayList<>();
-//        theQuestionsArraysForTheGame = new ProcessQuestionsForGame().theProcessor();
-//
-////        InputStreamFromFile inputStreamFromFile = new InputStreamFromFile();
-////        ArrayList<ArrayList<Question_board>> theQuestionsArraysForTheGame;
-////        theQuestionsArraysForTheGame = inputStreamFromFile.injectInputStreamToReader();
-//
-//        //Test if we get Stream input
-////        for(int i = 0 ; i < 20 ; i++){
-////
-////            System.out.println(theQuestionsArraysForTheGame.get(0).get(i).toString());
-////
-////        }
-////        for(int i = 0 ; i < 20 ; i++){
-////
-////            System.out.println(theQuestionsArraysForTheGame.get(1).get(i).toString());
-////
-////        }
-//    }
 
     private volatile JeopardyGame jeopardyGame;
 
-    public synchronized JeopardyGame getActiveGame (TUI tui) throws IOException, ParseException {
+    public synchronized JeopardyGame getActiveGame () throws IOException, ParseException {
 
         ArrayList<ArrayList<Question_board>> theQuestionsArraysForTheGame = new ArrayList<>();
         theQuestionsArraysForTheGame = new ProcessQuestionsForGame().theProcessor();
 
-//        InputStreamFromFile inputStreamFromFile = new InputStreamFromFile();
-//        ArrayList<ArrayList<Question_board>> theQuestionsArraysForTheGame;
-//        theQuestionsArraysForTheGame = inputStreamFromFile.injectInputStreamToReader();
-
-        //Test if we get Stream input
-//        for(int i = 0 ; i < 20 ; i++){
-//
-//            System.out.println(theQuestionsArraysForTheGame.get(0).get(i).toString());
-//
-//        }
-//        for(int i = 0 ; i < 20 ; i++){
-//
-//            System.out.println(theQuestionsArraysForTheGame.get(1).get(i).toString());
-//
-//        }
-
-
         if (jeopardyGame == null || jeopardyGame.done()) {
-            jeopardyGame = new JeopardyGame(2, clients, theQuestionsArraysForTheGame, tui);
+            jeopardyGame = new JeopardyGame(2, clients, theQuestionsArraysForTheGame);
         }
         return jeopardyGame;
     }
