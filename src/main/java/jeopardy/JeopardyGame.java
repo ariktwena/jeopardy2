@@ -5,7 +5,9 @@ import jeopardy.tui.TUI;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 public class JeopardyGame {
     private volatile int waiting;
@@ -22,6 +24,7 @@ public class JeopardyGame {
     private volatile int question_index;
     private volatile String playerCategoryChoice;
     private boolean switchPlayer;
+    private boolean timesUp;
 
     public JeopardyGame(int capacity, List<JeopardyClient> clients, ArrayList<ArrayList<Question_board>> easyHardArray) {
         this.waiting = capacity;
@@ -38,6 +41,7 @@ public class JeopardyGame {
         this.playerCategoryChoice = "";
         this.switchPlayer = false;
         this.winner = null;
+        this.timesUp = false;
     }
 
     public void play(JeopardyClient client, GameParticipant participant) throws InterruptedException, IOException {
@@ -250,11 +254,27 @@ public class JeopardyGame {
 
 
     public void playEnterGame(GameParticipant participant) throws InterruptedException {
+
         participant.notifyGameStart();
         while (true) {
             if (done() || participant.getAnswer().equals("")) {
                 break;
             }
+//            try {
+//                if (done() || participant.getAnswer().equals("")) {
+//                    break;
+//                }
+//
+//                Thread thread = new Thread();
+//                thread.start();
+//                thread.wait(3000);
+//                thread.interrupt();
+//                thread.join(3000);
+//            }
+//            catch (InterruptedException interruptedException) {
+//                System.out.println("Too slow, i'm going home");
+//                break;
+//            }
         }
         JeopardyClient winner = getAndSetWinner(participant.getClient());
     }
@@ -278,6 +298,17 @@ public class JeopardyGame {
     
     public synchronized boolean done() {
         return winner != null;
+    }
+
+    public void timesUp (){
+        long start_time = System.currentTimeMillis();
+        long wait_time = 4000;
+        long end_time = start_time + wait_time;
+        if(System.currentTimeMillis() < end_time){
+            timesUp = true;
+        } else {
+            timesUp = false;
+        }
     }
 
 
