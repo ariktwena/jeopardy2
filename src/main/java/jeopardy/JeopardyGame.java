@@ -282,9 +282,9 @@ public class JeopardyGame {
 
 
         while (true) {
-            if (done() || participant.getAnswer().equals("")) {
-                break;
-            }
+//            if (done() || participant.getAnswer().equals("")) {
+//                break;
+//            }
             if (done()) {
                 break;
             }
