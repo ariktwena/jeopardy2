@@ -19,6 +19,19 @@ public class TUI {
 
     }
 
+    //Get answer "return Game"
+    public String getAnswerReturnGame() throws InterruptedException {
+        String answer = scanner.nextLine();
+        return answer;
+
+//        String answer = "";
+//        scanner.nextLine().wait(2000);
+//        if(scanner.hasNextLine()){
+//            String name = scanner.nextLine();
+//        }
+//        return answer;
+    }
+
     //Get player name
     public String getPlayerName() {
         System.out.println("");

@@ -164,8 +164,10 @@ public class JeopardyGame {
 
             if(client.isPlayerTurn()){
                 participant.exitSwitch(client.getClientName());
+                client.removeClient(client);
             } else {
                 participant.youAreTheWinner(client.getClientName());
+                client.removeClient(client);
             }
         }
     }
@@ -254,12 +256,63 @@ public class JeopardyGame {
 
 
     public void playEnterGame(GameParticipant participant) throws InterruptedException {
+        long start_time = System.currentTimeMillis();
+        long wait_time = 4000;
+        long end_time = start_time + wait_time;
+
+        String answer;
 
         participant.notifyGameStart();
+//        Thread t = new Thread();
+//        t.start();
+//
+//        while(t.isAlive()){
+//            t.join(3000);
+//            if (done()) {
+//                break;
+//            }
+//            else if (System.currentTimeMillis() > end_time) {
+//                break;
+//            }
+//            //This is the problem.The scanner blocks the loop
+//            else if (participant.getAnswer().equals("")) {
+//                break;
+//            }
+//        }
+
+
         while (true) {
             if (done() || participant.getAnswer().equals("")) {
                 break;
             }
+            if (done()) {
+                break;
+            }
+            else if (System.currentTimeMillis() > end_time) {
+                break;
+            }
+            //This is the problem.The scanner blocks the loop
+            else if (participant.getAnswer().equals("")) {
+                break;
+            }
+//            try{
+//                t.wait(3000);
+//                t.join(3000);
+//                if (done()) {
+//                    break;
+//                }
+//                else if (System.currentTimeMillis() > end_time) {
+//                    break;
+//                }
+//                //This is the problem.The scanner blocks the loop
+//                else if (participant.getAnswer().equals("")) {
+//                    break;
+//                }
+//
+//            } catch (InterruptedException e){
+//                break;
+//            }
+
 //            try {
 //                if (done() || participant.getAnswer().equals("")) {
 //                    break;
@@ -276,6 +329,8 @@ public class JeopardyGame {
 //                break;
 //            }
         }
+//        t.interrupt();
+//        t.join();
         JeopardyClient winner = getAndSetWinner(participant.getClient());
     }
     

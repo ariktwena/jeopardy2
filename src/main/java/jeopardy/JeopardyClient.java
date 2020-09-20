@@ -270,8 +270,9 @@ public class JeopardyClient extends Thread implements Closeable {
                     }
 
                     @Override
-                    public String getAnswer() {
-                        return handler.waitForLine();
+                    public String getAnswer() throws InterruptedException {
+                        return tui.getAnswerReturnGame();
+//                        return handler.waitForLine();
                     }
                     @Override
                     public void toSlow() {
@@ -459,6 +460,10 @@ public class JeopardyClient extends Thread implements Closeable {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void removeClient(JeopardyClient client){
+        this.removeClient(client);
     }
 
     public int getScore() {
