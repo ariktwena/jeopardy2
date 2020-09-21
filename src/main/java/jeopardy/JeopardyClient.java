@@ -271,8 +271,10 @@ public class JeopardyClient extends Thread implements Closeable {
 
                     @Override
                     public String getAnswer() throws InterruptedException {
+
                         return tui.getAnswerReturnGame();
 //                        return handler.waitForLine();
+//                        return "Hallo";
                     }
                     @Override
                     public void toSlow() {

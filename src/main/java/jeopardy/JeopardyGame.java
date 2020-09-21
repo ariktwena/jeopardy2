@@ -295,6 +295,7 @@ public class JeopardyGame {
             else if (participant.getAnswer().equals("")) {
                 break;
             }
+
 //            try{
 //                t.wait(3000);
 //                t.join(3000);

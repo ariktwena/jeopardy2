@@ -2,6 +2,8 @@ package jeopardy.tui;
 
 import jeopardy.classes.Board;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
@@ -21,15 +23,28 @@ public class TUI {
 
     //Get answer "return Game"
     public String getAnswerReturnGame() throws InterruptedException {
-        String answer = scanner.nextLine();
-        return answer;
 
-//        String answer = "";
-//        scanner.nextLine().wait(2000);
-//        if(scanner.hasNextLine()){
-//            String name = scanner.nextLine();
-//        }
+//        String answer = scanner.nextLine();
 //        return answer;
+
+//        try{
+//            Thread myThread = new Thread();
+//            while(System.in.available() == 0 && !myThread.isInterrupted()) {
+//                Thread.sleep(100);
+//            }
+//            if(!myThread.isInterrupted()){
+//                return scanner.nextLine();
+//            }
+//            return "Hallo";
+//        } catch (IOException e){
+//            e.printStackTrace();
+//        } catch (InterruptedException e){
+//            e.printStackTrace();
+//        }
+//
+//        return "Hallo";
+
+        return scanner.nextLine();
     }
 
     //Get player name
